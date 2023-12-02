@@ -46,7 +46,7 @@ class Record:
     def __str__(self):
         result = f"{self.name}"
         if self.phones:
-            result += f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+            result += f" Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
         return result
 
     def add_phone(self, phone_number):
@@ -110,14 +110,12 @@ class AddressBook(UserDict):
 
     def search(self, query):
         results = []
-        for record in self.data.values():
-            if query.lower() in record.name.value.lower():
+        for record_data in self.data.values():
+            record = Record(record_data['name'])
+            for phone_number in record_data.get('phones', []):
+                record.add_phone(phone_number)
+            if query.lower() in record.name.value.lower() or any(query in phone.value for phone in record.phones):
                 results.append(record)
-            else:
-                for phone in record.phones:
-                    if query in phone.value:
-                        results.append(record)
-                        break
         return results
 
 if __name__ == "__main__":
